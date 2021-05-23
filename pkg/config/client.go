@@ -68,10 +68,10 @@ type ClientCommonConf struct {
 	// is 0.
 	AdminPort int `ini:"admin_port" json:"admin_port"`
 	// AdminUser specifies the username that the admin server will use for
-	// login. By default, this value is "admin".
+	// login.
 	AdminUser string `ini:"admin_user" json:"admin_user"`
 	// AdminPwd specifies the password that the admin server will use for
-	// login. By default, this value is "admin".
+	// login.
 	AdminPwd string `ini:"admin_pwd" json:"admin_pwd"`
 	// AssetsDir specifies the local directory that the admin server will load
 	// resources from. If this value is "", assets will be loaded from the
@@ -290,7 +290,7 @@ func LoadAllProxyConfsFromIni(
 	for _, section := range rangeSections {
 		err = renderRangeProxyTemplates(f, section)
 		if err != nil {
-			return nil, nil, fmt.Errorf("fail to render range-section[%s] with error: %v", section.Name(), err)
+			return nil, nil, fmt.Errorf("failed to render template for proxy %s: %v", section.Name(), err)
 		}
 	}
 
@@ -315,7 +315,7 @@ func LoadAllProxyConfsFromIni(
 		case "server":
 			newConf, newErr := NewProxyConfFromIni(prefix, name, section)
 			if newErr != nil {
-				return nil, nil, fmt.Errorf("fail to parse section[%s], err: %v", name, newErr)
+				return nil, nil, fmt.Errorf("failed to parse proxy %s, err: %v", name, newErr)
 			}
 			proxyConfs[prefix+name] = newConf
 		case "visitor":
@@ -325,7 +325,7 @@ func LoadAllProxyConfsFromIni(
 			}
 			visitorConfs[prefix+name] = newConf
 		default:
-			return nil, nil, fmt.Errorf("section[%s] role should be 'server' or 'visitor'", name)
+			return nil, nil, fmt.Errorf("proxy %s role should be 'server' or 'visitor'", name)
 		}
 	}
 	return proxyConfs, visitorConfs, nil
