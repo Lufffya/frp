@@ -6,17 +6,6 @@
 
 [README](README.md) | [中文文档](README_zh.md)
 
-<h3 align="center">Platinum Sponsors</h3>
-<!--platinum sponsors start-->
-
-<p align="center">
-  <a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
-    <img width="400px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_doppler.png">
-  </a>
-</p>
-
-<!--platinum sponsors end-->
-
 <h3 align="center">Gold Sponsors</h3>
 <!--gold sponsors start-->
 
@@ -27,10 +16,6 @@
 </p>
 
 <!--gold sponsors end-->
-
-<h3 align="center">Silver Sponsors</h3>
-
-* Sakura Frp - 欢迎点击 "加入我们"
 
 ## What is frp?
 
@@ -74,6 +59,7 @@ frp also has a P2P connect mode.
         * [For Each Proxy](#for-each-proxy)
     * [TCP Stream Multiplexing](#tcp-stream-multiplexing)
     * [Support KCP Protocol](#support-kcp-protocol)
+    * [Support QUIC Protocol](#support-quic-protocol)
     * [Connection Pooling](#connection-pooling)
     * [Load balancing](#load-balancing)
     * [Service Health Check](#service-health-check)
@@ -153,7 +139,7 @@ Note that `local_port` (listened on client) and `remote_port` (exposed on server
 
   `./frpc -c ./frpc.ini`
 
-5. From another machine, SSH to server B like this (assuming that username is `test`):
+5. From another machine, SSH to server B via server A  like this (assuming that username is `test`):
 
   `ssh -oPort=6000 test@x.x.x.x`
 
@@ -656,7 +642,7 @@ openssl req -new -sha256 -key server.key \
     -config <(cat my-openssl.cnf <(printf "\n[SAN]\nsubjectAltName=DNS:localhost,IP:127.0.0.1,DNS:example.server.com")) \
     -out server.csr
 
-openssl x509 -req -days 365 \
+openssl x509 -req -days 365 -sha256 \
 	-in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
 	-extfile <(printf "subjectAltName=DNS:localhost,IP:127.0.0.1,DNS:example.server.com") \
 	-out server.crt
@@ -671,7 +657,7 @@ openssl req -new -sha256 -key client.key \
     -config <(cat my-openssl.cnf <(printf "\n[SAN]\nsubjectAltName=DNS:client.com,DNS:example.client.com")) \
     -out client.csr
 
-openssl x509 -req -days 365 \
+openssl x509 -req -days 365 -sha256 \
     -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
 	-extfile <(printf "subjectAltName=DNS:client.com,DNS:example.client.com") \
 	-out client.crt
@@ -731,6 +717,8 @@ bandwidth_limit = 1MB
 
 Set `bandwidth_limit` in each proxy's configure to enable this feature. Supported units are `MB` and `KB`.
 
+Set `bandwidth_limit_mode` to `client` or `server` to limit bandwidth on the client or server side. Default is `client`.
+
 ### TCP Stream Multiplexing
 
 frp supports tcp stream multiplexing since v0.10.0 like HTTP2 Multiplexing, in which case all logic connections to the same frpc are multiplexed into the same TCP connection.
@@ -770,6 +758,35 @@ KCP mode uses UDP as the underlying transport. Using KCP in frp:
   # Same as the 'kcp_bind_port' in frps.ini
   server_port = 7000
   protocol = kcp
+  ```
+
+### Support QUIC Protocol
+
+QUIC is a new multiplexed transport built on top of UDP.
+
+Using QUIC in frp:
+
+1. Enable QUIC in frps:
+
+  ```ini
+  # frps.ini
+  [common]
+  bind_port = 7000
+  # Specify a UDP port for QUIC.
+  quic_bind_port = 7000
+  ```
+
+  The `quic_bind_port` number can be the same number as `bind_port`, since `bind_port` field specifies a TCP port.
+
+2. Configure `frpc.ini` to use QUIC to connect to frps:
+
+  ```ini
+  # frpc.ini
+  [common]
+  server_addr = x.x.x.x
+  # Same as the 'quic_bind_port' in frps.ini
+  server_port = 7000
+  protocol = quic
   ```
 
 ### Connection Pooling
@@ -883,7 +900,7 @@ custom_domains = test.example.com
 host_header_rewrite = dev.example.com
 ```
 
-The HTTP request will have the the `Host` header rewritten to `Host: dev.example.com` when it reaches the actual web server, although the request from the browser probably has `Host: test.example.com`.
+The HTTP request will have the `Host` header rewritten to `Host: dev.example.com` when it reaches the actual web server, although the request from the browser probably has `Host: test.example.com`.
 
 ### Setting other HTTP Headers
 

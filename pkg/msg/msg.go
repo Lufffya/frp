@@ -14,7 +14,9 @@
 
 package msg
 
-import "net"
+import (
+	"net"
+)
 
 const (
 	TypeLogin                 = 'o'
@@ -37,28 +39,26 @@ const (
 	TypeNatHoleSid            = '5'
 )
 
-var (
-	msgTypeMap = map[byte]interface{}{
-		TypeLogin:                 Login{},
-		TypeLoginResp:             LoginResp{},
-		TypeNewProxy:              NewProxy{},
-		TypeNewProxyResp:          NewProxyResp{},
-		TypeCloseProxy:            CloseProxy{},
-		TypeNewWorkConn:           NewWorkConn{},
-		TypeReqWorkConn:           ReqWorkConn{},
-		TypeStartWorkConn:         StartWorkConn{},
-		TypeNewVisitorConn:        NewVisitorConn{},
-		TypeNewVisitorConnResp:    NewVisitorConnResp{},
-		TypePing:                  Ping{},
-		TypePong:                  Pong{},
-		TypeUDPPacket:             UDPPacket{},
-		TypeNatHoleVisitor:        NatHoleVisitor{},
-		TypeNatHoleClient:         NatHoleClient{},
-		TypeNatHoleResp:           NatHoleResp{},
-		TypeNatHoleClientDetectOK: NatHoleClientDetectOK{},
-		TypeNatHoleSid:            NatHoleSid{},
-	}
-)
+var msgTypeMap = map[byte]interface{}{
+	TypeLogin:                 Login{},
+	TypeLoginResp:             LoginResp{},
+	TypeNewProxy:              NewProxy{},
+	TypeNewProxyResp:          NewProxyResp{},
+	TypeCloseProxy:            CloseProxy{},
+	TypeNewWorkConn:           NewWorkConn{},
+	TypeReqWorkConn:           ReqWorkConn{},
+	TypeStartWorkConn:         StartWorkConn{},
+	TypeNewVisitorConn:        NewVisitorConn{},
+	TypeNewVisitorConnResp:    NewVisitorConnResp{},
+	TypePing:                  Ping{},
+	TypePong:                  Pong{},
+	TypeUDPPacket:             UDPPacket{},
+	TypeNatHoleVisitor:        NatHoleVisitor{},
+	TypeNatHoleClient:         NatHoleClient{},
+	TypeNatHoleResp:           NatHoleResp{},
+	TypeNatHoleClientDetectOK: NatHoleClientDetectOK{},
+	TypeNatHoleSid:            NatHoleSid{},
+}
 
 // When frpc start, client send this message to login to server.
 type Login struct {
@@ -85,13 +85,15 @@ type LoginResp struct {
 
 // When frpc login success, send this message to frps for running a new proxy.
 type NewProxy struct {
-	ProxyName      string            `json:"proxy_name,omitempty"`
-	ProxyType      string            `json:"proxy_type,omitempty"`
-	UseEncryption  bool              `json:"use_encryption,omitempty"`
-	UseCompression bool              `json:"use_compression,omitempty"`
-	Group          string            `json:"group,omitempty"`
-	GroupKey       string            `json:"group_key,omitempty"`
-	Metas          map[string]string `json:"metas,omitempty"`
+	ProxyName          string            `json:"proxy_name,omitempty"`
+	ProxyType          string            `json:"proxy_type,omitempty"`
+	UseEncryption      bool              `json:"use_encryption,omitempty"`
+	UseCompression     bool              `json:"use_compression,omitempty"`
+	BandwidthLimit     string            `json:"bandwidth_limit,omitempty"`
+	BandwidthLimitMode string            `json:"bandwidth_limit_mode,omitempty"`
+	Group              string            `json:"group,omitempty"`
+	GroupKey           string            `json:"group_key,omitempty"`
+	Metas              map[string]string `json:"metas,omitempty"`
 
 	// tcp and udp only
 	RemotePort int `json:"remote_port,omitempty"`
@@ -129,8 +131,7 @@ type NewWorkConn struct {
 	Timestamp    int64  `json:"timestamp,omitempty"`
 }
 
-type ReqWorkConn struct {
-}
+type ReqWorkConn struct{}
 
 type StartWorkConn struct {
 	ProxyName string `json:"proxy_name,omitempty"`
@@ -187,8 +188,7 @@ type NatHoleResp struct {
 	Error       string `json:"error,omitempty"`
 }
 
-type NatHoleClientDetectOK struct {
-}
+type NatHoleClientDetectOK struct{}
 
 type NatHoleSid struct {
 	Sid string `json:"sid,omitempty"`

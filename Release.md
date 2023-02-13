@@ -1,8 +1,8 @@
 ### New
 
-* Use auto generated certificates if `plugin_key_path` and `plugin_crt_path` are empty for plugin `https2https` and `https2http`.
-* Server dashboard supports TLS configs.
+* Added config `bandwidth_limit_mode` in frpc, default value is `client` which is current behavior. Optional value is `server`, to enable bandwidth limit in server. The major aim is to let server plugin has the ability to modify bandwidth limit for each proxy.
 
-### Fix
+### Improve
 
-* xtcp error with IPv6 address.
+* `dns_server` supports ipv6.
+* frpc supports graceful shutdown for protocol `quic`.
