@@ -260,6 +260,7 @@ func Test_LoadClientCommonConf(t *testing.T) {
 		},
 		ServerAddr:              "0.0.0.9",
 		ServerPort:              7009,
+		NatHoleSTUNServer:       "stun.easyvoip.com:3478",
 		DialServerTimeout:       10,
 		DialServerKeepAlive:     7200,
 		HTTPProxy:               "http://user:passwd@192.168.1.128:8080",
@@ -499,8 +500,10 @@ func Test_LoadClientBasicConf(t *testing.T) {
 				},
 				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
-			Role: "server",
-			Sk:   "abcdefg",
+			RoleServerCommonConf: RoleServerCommonConf{
+				Role: "server",
+				Sk:   "abcdefg",
+			},
 		},
 		testUser + ".p2p_tcp": &XTCPProxyConf{
 			BaseProxyConf: BaseProxyConf{
@@ -512,8 +515,10 @@ func Test_LoadClientBasicConf(t *testing.T) {
 				},
 				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
-			Role: "server",
-			Sk:   "abcdefg",
+			RoleServerCommonConf: RoleServerCommonConf{
+				Role: "server",
+				Sk:   "abcdefg",
+			},
 		},
 		testUser + ".tcpmuxhttpconnect": &TCPMuxProxyConf{
 			BaseProxyConf: BaseProxyConf{
@@ -660,6 +665,10 @@ func Test_LoadClientBasicConf(t *testing.T) {
 				BindAddr:   "127.0.0.1",
 				BindPort:   9001,
 			},
+			Protocol:          "quic",
+			MaxRetriesAnHour:  8,
+			MinRetryInterval:  90,
+			FallbackTimeoutMs: 1000,
 		},
 	}
 

@@ -20,7 +20,7 @@ import (
 	"net"
 	"time"
 
-	gnet "github.com/fatedier/golib/net"
+	libnet "github.com/fatedier/golib/net"
 )
 
 type HTTPSMuxer struct {
@@ -28,13 +28,16 @@ type HTTPSMuxer struct {
 }
 
 func NewHTTPSMuxer(listener net.Listener, timeout time.Duration) (*HTTPSMuxer, error) {
-	mux, err := NewMuxer(listener, GetHTTPSHostname, nil, nil, nil, timeout)
+	mux, err := NewMuxer(listener, GetHTTPSHostname, timeout)
+	if err != nil {
+		return nil, err
+	}
 	return &HTTPSMuxer{mux}, err
 }
 
 func GetHTTPSHostname(c net.Conn) (_ net.Conn, _ map[string]string, err error) {
 	reqInfoMap := make(map[string]string, 0)
-	sc, rd := gnet.NewSharedConn(c)
+	sc, rd := libnet.NewSharedConn(c)
 
 	clientHello, err := readClientHello(rd)
 	if err != nil {
